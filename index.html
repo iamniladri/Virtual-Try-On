@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Virtual Mask Try-On</title>
+<script type="importmap">
+{
+"imports": {
+"three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+"three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+"mindar-face-three":
+"https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-face-three.prod.js"
+}
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { MindARThree } from 'mindar-face-three';
+document.addEventListener("DOMContentLoaded", () => {
+const mindarThree = new MindARThree({
+container: document.querySelector("#container"),
+});
+const { renderer, scene, camera } = mindarThree;
+const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+scene.add(light);
+const faceMesh = mindarThree.addFaceMesh();
+
+//const texture = new THREE.TextureLoader().load('mask.png'); 
+const maskTexture = new THREE.TextureLoader().load('maskHD.png'); 
+
+console.log("txxx",maskTexture);
+
+// faceMesh.material.map = texture;
+// faceMesh.material.transparent = true;
+
+const maskMaterial = new THREE.MeshStandardMaterial({
+    map: maskTexture,
+    transparent: true,
+    color: new THREE.Color(0x00FFFFFF)
+})
+
+//faceMesh.material.needsUpdate = true;
+faceMesh.material = maskMaterial;
+scene.add(faceMesh);
+
+
+const start = async () => {
+await mindarThree.start();
+renderer.setAnimationLoop(() => {
+renderer.render(scene, camera);
+});
+};
+start();
+});
+</script>
+<style>
+body {
+margin: 0;
+}
+#container {
+width: 100vw;
+height: 100vh;
+position: relative;
+overflow: hidden;
+}
+</style>
+</head>
+<body>
+<div id="container"></div>
+</body>
+</html>
